@@ -13,7 +13,9 @@
 #include "common/OutputUtils.hpp"
 
 // Warmup kernel to run first to remove startup overheads in timings
+#ifndef RAJAPERF_INFRASTRUCTURE_ONLY
 #include "basic/DAXPY.hpp"
+#endif
 
 // Standard library includes
 #include <list>
@@ -273,7 +275,6 @@ void Executor::setupSuite()
   using Slist = list<string>;
   using Svector = vector<string>;
   // Set of kernel IDs, e.g., DAXPY, IF_QUAD
-  using KIDset = set<KernelID>;
   // "variants" include CUDA, OpenMPTarget, OpenMP, HIP, Serial
   using VIDset = set<VariantID>;
   ///////////////////////////////////////////////////////////////////////////////////
@@ -284,7 +285,6 @@ void Executor::setupSuite()
   const Svector& kernel_input = run_params.getKernelInput();
 
   // Declare run_kern of type KIDset; contains the set of kernels (KernelBase* instances to run)
-  KIDset run_kern;
 
   /* LOGIC
   1) check if each of the inputs in matches a groupName;
@@ -673,7 +673,7 @@ void Executor::runSuite()
   }
 
   cout << "\n\nRun warmup kernel...\n";
-
+#ifndef RAJAPERF_INFRASTRUCTURE_ONLY
   KernelBase* warmup_kernel = new basic::DAXPY(run_params);
 
   for (size_t iv = 0; iv < variant_ids.size(); ++iv) {
@@ -692,7 +692,7 @@ void Executor::runSuite()
   }
 
   delete warmup_kernel;
-
+#endif
 
   cout << "\n\nRunning specified kernels and variants...\n";
 
@@ -701,7 +701,6 @@ void Executor::runSuite()
     if ( run_params.showProgress() ) {
       std::cout << "\nPass through suite # " << ip << "\n";
     }
-
     for (size_t ik = 0; ik < kernels.size(); ++ik) {
       KernelBase* kernel = kernels[ik];
       if ( run_params.showProgress() ) {

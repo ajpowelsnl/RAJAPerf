@@ -24,28 +24,41 @@ namespace rajaperf {
         using is_empty = std::is_same<runData, empty>;
         runData rd;
     public:
-        QuickKernelBase(std::string &name, const RunParams &params, SetUp se, Execute ex, Checksum ch) : KernelBase(
+        //Index_type getDefaultSize() const { return 1000; }
+        //Index_type getDefaultReps() const { return 1000; }
+        //Index_type getItsPerRep() const override { return 1000; }
+        //Index_type getRunReps() const { return 1; }
+        QuickKernelBase(std::string &name, const RunParams &params, SetUp setup_lambda, Execute test_lambda, Checksum checksum_lambda) : KernelBase(
                 name,
                 params),
-                                                                                                         m_setup(se),
-                                                                                                         m_execute(ex),
+                                                                                                         m_setup(setup_lambda),
+                                                                                                         m_execute(test_lambda),
                                                                                                          m_checksum(
-                                                                                                                 ch) {}
+                                                                                                                 checksum_lambda) {
+            setVariantDefined(Kokkos_Lambda);
+            setDefaultSize(100000);
+            setDefaultReps(5000);
+        }
 
-        QuickKernelBase(std::string &name, const RunParams &params, SetUp se, Execute ex) : KernelBase(name,
+        QuickKernelBase(std::string &name, const RunParams &params, SetUp setup_lambda, Execute test_lambda) : KernelBase(name,
                                                                                                        params),
-                                                                                            m_setup(se),
-                                                                                            m_execute(ex),
+                                                                                            m_setup(setup_lambda),
+                                                                                            m_execute(test_lambda),
                                                                                             m_checksum(
-                                                                                                    SureBuddyOkay()) {}
+                                                                                                    SureBuddyOkay()) {
+setVariantDefined(Kokkos_Lambda);
+            setDefaultSize(100000);
+            setDefaultReps(50);
+        }
 
         Real_type m_y;
 
         void setUpHelper(std::true_type) {
+            m_setup(getItsPerRep(), getRunSize());
         }
 
         void setUpHelper(std::false_type) {
-            rd = m_setup(0, 0);
+            rd = m_setup(getItsPerRep(), getRunSize());
         }
 
         void setUp(VariantID vid) override {
@@ -78,7 +91,7 @@ namespace rajaperf {
         void runOpenMPTargetVariant(VariantID vid) override {}
 #endif
 
-#if defined(RUN_KOKKOS)
+#if defined(RUN_KOKKOS) or defined(RAJAPERF_INFRASTRUCTURE_ONLY)
 
         template<size_t... Is>
         void rkv_helper(std::index_sequence<Is...>) {
@@ -90,7 +103,7 @@ namespace rajaperf {
 
         void rkv_helper(empty em) {
             auto size = getRunSize();
-            for (int x = 0; x < getRunReps(); ++x) {
+            for (int x = 0; x < getDefaultSize(); ++x) {
                 m_execute(x, size);
             }
         }
@@ -103,11 +116,12 @@ namespace rajaperf {
 
         void rkv_switch_on_empty(std::true_type) {
             rkv_helper(empty());
-
         }
 
         void runKokkosVariant(VariantID vid) override {
+          startTimer();
             rkv_switch_on_empty(is_empty());
+          stopTimer();
         }
 
 #endif // RUN_KOKKOS

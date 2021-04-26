@@ -12,7 +12,11 @@ cmake_minimum_required(VERSION 3.9)
 option(ENABLE_RAJA_SEQUENTIAL "Run sequential variants of RAJA kernels. Disable
 this, and all other variants, to run _only_ raw C loops." On)
 option(ENABLE_KOKKOS "Include Kokkos implementations of the kernels in the RAJA Perfsuite" Off)
+option(INFRASTRUCTURE_ONLY "Only build the infrastructure, don't build kernels" ON)
 
+if(INFRASTRUCTURE_ONLY)
+  add_definitions("-DRAJAPERF_INFRASTRUCTURE_ONLY")
+endif()
 #
 # Initialize the BLT build system
 #
@@ -50,11 +54,12 @@ set(RAJA_DATA_ALIGN 64)
 
 
 # exclude RAJA make targets from top-level build...
+if(NOT INFRASTRUCTURE_ONLY)
 add_subdirectory(tpl/RAJA)
 
 get_property(RAJA_INCLUDE_DIRS DIRECTORY tpl/RAJA PROPERTY INCLUDE_DIRECTORIES)
 include_directories(${RAJA_INCLUDE_DIRS})
-
+endif()
 #
 # Setup variables to pass to Perf suite
 #
@@ -74,7 +79,9 @@ set(RAJA_PERFSUITE_VERSION_MAJOR 0)
 set(RAJA_PERFSUITE_VERSION_MINOR 10)
 set(RAJA_PERFSUITE_VERSION_PATCHLEVEL 0)
 
+if(NOT INFRASTUCTURE_ONLY)
 set(RAJA_PERFSUITE_DEPENDS RAJA)
+endif()
 
 if (ENABLE_OPENMP)
   list(APPEND RAJA_PERFSUITE_DEPENDS openmp)
@@ -110,7 +117,7 @@ else()
   list(APPEND RAJAPERF_COMPILER_OPTIONS ${CMAKE_CXX_FLAGS})
 endif()
 
-configure_file(${CMAKE_SOURCE_DIR}/src/rajaperf_config.hpp.in
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/rajaperf_config.hpp.in
   ${CMAKE_CURRENT_BINARY_DIR}/bin/rajaperf_config.hpp)
 
 # Make sure RAJA flag propagate
@@ -121,7 +128,7 @@ set (HIP_HIPCC_FLAGS ${RAJA_HIPCC_FLAGS})
 include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/tpl/RAJA/include/)
 
 
-
+if(NOT INFRASTRUCTURE_ONLY)
 # ENABLE KOKKOS IS A RAJA PERFSUITE OPTION
 if(ENABLE_KOKKOS)
   add_definitions(-DRUN_KOKKOS)
@@ -183,7 +190,7 @@ if(ENABLE_KOKKOS)
   
   list(APPEND RAJA_PERFSUITE_DEPENDS kokkos)
 endif()
-
+endif() # INFRASTRUCTURE_ONLY
 
 #
 # Each directory in the perf suite has its own CMakeLists.txt file.

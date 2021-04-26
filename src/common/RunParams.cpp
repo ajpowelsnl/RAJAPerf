@@ -383,12 +383,13 @@ void RunParams::printKernelNames(std::ostream& str) const
 {
   str << "\nAvailable kernels:";
   str << "\n------------------\n";
-  for (int ik = 0; ik < NumKernels; ++ik) {
-/// RDH DISABLE COUPLE KERNEL
-    if ( /** static_cast<KernelID>(ik) != Apps_COUPLE*/ true) {
-      str << getKernelName(static_cast<KernelID>(ik)) << std::endl;
-    }
-  }
+  // TODO: replace this logic
+  //for (int ik = 0; ik < NumKernels; ++ik) {
+///// RDH DISABLE COUPLE KERNEL
+  //  if ( /** static_cast<KernelID>(ik) != Apps_COUPLE*/ true) {
+  //    str << getKernelName(static_cast<KernelID>(ik)) << std::endl;
+  //  }
+  //}
   str.flush();
 }
 
@@ -397,12 +398,13 @@ void RunParams::printFullKernelNames(std::ostream& str) const
 {
   str << "\nAvailable kernels (<group name>_<kernel name>):";
   str << "\n-----------------------------------------\n";
-  for (int ik = 0; ik < NumKernels; ++ik) {
-/// RDH DISABLE COUPLE KERNEL
-    if ( /** static_cast<KernelID>(ik) != Apps_COUPLE */ true) {
-      str << getFullKernelName(static_cast<KernelID>(ik)) << std::endl;
-    }
-  }
+  // TODO: replace
+  //for (int ik = 0; ik < NumKernels; ++ik) {
+///// RDH DISABLE COUPLE KERNEL
+  //  if ( /** static_cast<KernelID>(ik) != Apps_COUPLE */ true) {
+  //    str << getFullKernelName(static_cast<KernelID>(ik)) << std::endl;
+  //  }
+  //}
   str.flush();
 }
 
@@ -411,9 +413,9 @@ void RunParams::printVariantNames(std::ostream& str) const
 {
   str << "\nAvailable variants:";
   str << "\n-------------------\n";
-  for (int iv = 0; iv < NumVariants; ++iv) {
-    str << getVariantName(static_cast<VariantID>(iv)) << std::endl;
-  }
+  //for (int iv = 0; iv < NumVariants; ++iv) {
+  //  str << getVariantName(static_cast<VariantID>(iv)) << std::endl;
+  //}
   str.flush();
 }
 
@@ -422,9 +424,9 @@ void RunParams::printGroupNames(std::ostream& str) const
 {
   str << "\nAvailable groups:";
   str << "\n-----------------\n";
-  for (int is = 0; is < NumGroups; ++is) {
-    str << getGroupName(static_cast<GroupID>(is)) << std::endl;
-  }
+  //for (int is = 0; is < NumGroups; ++is) {
+  //  str << getGroupName(static_cast<GroupID>(is)) << std::endl;
+  //}
   str.flush();
 }
 

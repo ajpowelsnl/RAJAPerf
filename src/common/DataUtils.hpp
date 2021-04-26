@@ -15,7 +15,7 @@
 #define RAJAPerf_DataUtils_HPP
 
 #include "RAJAPerfSuite.hpp"
-#include "RPTypes.hpp"
+//#include "RPTypes.hpp"
 
 #include <limits>
 #include <new>

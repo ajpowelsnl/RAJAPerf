@@ -10,11 +10,14 @@
 #define RAJAPerf_KernelBase_HPP
 
 #include "common/RAJAPerfSuite.hpp"
-#include "common/RPTypes.hpp"
-#include "common/DataUtils.hpp"
+//#include "common/RPTypes.hpp"
 #include "common/RunParams.hpp"
-
+#ifndef RAJAPERF_INFRASTRUCTURE_ONLY
 #include "RAJA/util/Timer.hpp"
+#include "common/DataUtils.hpp"
+#else
+#include "common/BuiltinTimer.hpp"
+#endif
 #if defined(RAJA_ENABLE_CUDA)
 #include "RAJA/policy/cuda/raja_cudaerrchk.hpp"
 #endif
@@ -38,12 +41,16 @@ class KernelBase
 {
 public:
 
-  KernelBase(KernelID kid, const RunParams& params);
+ // KernelBase(KernelID kid, const RunParams& params);
   KernelBase(std::string name, const RunParams& params);
 
+#ifndef RAJAPERF_INFRASTRUCTURE_ONLY
+   using TimerType = RAJA::Timer;
+#else
+   using TimerType = rajaperf::ChronoTimer;
+#endif
   virtual ~KernelBase();
 
-  KernelID     getKernelID() const { return kernel_id; }
   const std::string& getName() const { return name; }
   void setName(const std::string& new_name) { name = new_name; }
 
@@ -104,7 +111,10 @@ public:
     timer.stop(); recordExecTime();
   }
 
-  void resetTimer() { timer.reset(); }
+  void resetTimer(
+          ) {
+      timer.reset();
+  }
 
   //
   // Virtual and pure virtual methods that may/must be implemented
@@ -135,7 +145,7 @@ public:
   virtual void runOpenMPTargetVariant(VariantID vid) = 0;
 #endif
 
-#if defined(RUN_KOKKOS)
+#if defined(RUN_KOKKOS) or defined(RAJAPERF_INFRASTRUCTURE_ONLY)
   virtual void runKokkosVariant(VariantID vid) = 0;
 #endif // RUN_KOKKOS
 
@@ -149,7 +159,6 @@ private:
 
   void recordExecTime(); 
 
-  KernelID    kernel_id;
   std::string name;
 
   Index_type default_size;
@@ -158,13 +167,11 @@ private:
   VariantID running_variant; 
 
   int num_exec[NumVariants];
+  TimerType timer;
 
-  RAJA::Timer timer;
-
-  RAJA::Timer::ElapsedType min_time[NumVariants];
-  RAJA::Timer::ElapsedType max_time[NumVariants];
-  RAJA::Timer::ElapsedType tot_time[NumVariants];
-
+  TimerType::ElapsedType min_time[NumVariants];
+  TimerType::ElapsedType max_time[NumVariants];
+  TimerType::ElapsedType tot_time[NumVariants];
   bool has_variant_to_run[NumVariants];
 };
 
