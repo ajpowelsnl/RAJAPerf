@@ -34,7 +34,6 @@ KernelBase::KernelBase(KernelID kid, const RunParams& params)
 
     KernelBase::KernelBase(std::string name, const RunParams& params)
             : run_params(params),
-              kernel_id(Basic_DAXPY), // TODO DZP: better
               name(name),
               default_size(0),
               default_reps(0),
@@ -84,8 +83,9 @@ void KernelBase::execute(VariantID vid)
   running_variant = vid;
 
   resetTimer();
-
+#ifndef RAJAPERF_INFRASTRUCTURE_ONLY
   resetDataInitCount();
+#endif
   this->setUp(vid);
 #ifdef RUN_KOKKOS 
   Kokkos::Tools::pushRegion(this->getName() + ":"+getVariantName(vid));
@@ -105,8 +105,7 @@ void KernelBase::execute(VariantID vid)
 void KernelBase::recordExecTime()
 {
   num_exec[running_variant]++;
-
-  RAJA::Timer::ElapsedType exec_time = timer.elapsed();
+  TimerType::ElapsedType exec_time = timer.elapsed();
   min_time[running_variant] = std::min(min_time[running_variant], exec_time);
   max_time[running_variant] = std::max(max_time[running_variant], exec_time);
   tot_time[running_variant] += exec_time;
@@ -176,7 +175,7 @@ void KernelBase::runKernel(VariantID vid)
       break;
     }
 
-#if defined(RUN_KOKKOS)
+#if defined(RUN_KOKKOS) or defined (RAJAPERF_INFRASTRUCTURE_ONLY)
     case Kokkos_Lambda :
     case Kokkos_Functor :
     {
@@ -197,7 +196,7 @@ void KernelBase::runKernel(VariantID vid)
 void KernelBase::print(std::ostream& os) const
 {
   os << "\nKernelBase::print..." << std::endl;
-  os << "\t\t name(id) = " << name << "(" << kernel_id << ")" << std::endl;
+  os << "\t\t name = " << name << std::endl;
   os << "\t\t\t default_size = " << default_size << std::endl;
   os << "\t\t\t default_reps = " << default_reps << std::endl;
   os << "\t\t\t num_exec: " << std::endl;
