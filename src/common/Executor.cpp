@@ -13,7 +13,9 @@
 #include "common/OutputUtils.hpp"
 
 // Warmup kernel to run first to remove startup overheads in timings
+#ifndef RAJAPERF_INFRASTRUCTURE_ONLY
 #include "basic/DAXPY.hpp"
+#endif
 
 // Standard library includes
 #include <list>
@@ -58,7 +60,11 @@ namespace rajaperf {
             delete kernels[ik];
         }
 
-    }
+  // Pre-processor directives
+#if defined(RUN_KOKKOS)
+  Kokkos::finalize(); // TODO DZP: should this be here?  Good question.  AJP
+#endif
+}
 
 // New functions for Kokkos to register new group and kernel IDs
 // The return type is Executor::groupID
@@ -115,6 +121,7 @@ namespace rajaperf {
             // fullKernelSet is of type std::set<kernelBase*>
 
             for (auto kernel: fullKernelSet) {
+  // closing brace for rajaperf namespace
 
                 std::cout << kernel->getName() << std::endl;
 
