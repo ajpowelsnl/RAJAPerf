@@ -9,6 +9,10 @@
 include_directories(.)
 
 add_subdirectory(common)
+set(INFRASTRUCTURE_ONLY TRUE)
+if(NOT INFRASTRUCTURE_ONLY)
+
+add_subdirectory(common)
 add_subdirectory(apps)
 add_subdirectory(apps-kokkos)
 add_subdirectory(basic)
@@ -21,12 +25,17 @@ add_subdirectory(stream)
 add_subdirectory(stream-kokkos)
 #add_subdirectory(algorithm)
 
-set(RAJA_PERFSUITE_EXECUTABLE_DEPENDS
+
+endif()
+set(RAJA_PERFSUITE_EXECUTABLE_DEPENDS common)
+
+if(NOT INFRASTRUCTURE_ONLY)
+list(APPEND RAJA_PERFSUITE_EXECUTABLE_DEPENDS
+    basic
+    basic-kokkos
     common
 	apps
 	apps-kokkos
-    basic
-    basic-kokkos
     #kokkos-mechanics
     lcals
     lcals-kokkos
@@ -35,6 +44,7 @@ set(RAJA_PERFSUITE_EXECUTABLE_DEPENDS
     stream-kokkos
     #algorithm
     )
+endif()
 list(APPEND RAJA_PERFSUITE_EXECUTABLE_DEPENDS ${RAJA_PERFSUITE_DEPENDS}) 
 
 if(ENABLE_TARGET_OPENMP)
@@ -236,9 +246,11 @@ blt_add_executable(
 )
 
 else()
+  if(NOT INFRASTRUCTURE_ONLY)
 blt_add_executable(
   NAME raja-perf.exe
   SOURCES RAJAPerfSuiteDriver.cpp
   DEPENDS_ON ${RAJA_PERFSUITE_EXECUTABLE_DEPENDS}
   )
+    endif()
 endif()
