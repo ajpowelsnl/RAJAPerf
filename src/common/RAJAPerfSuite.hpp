@@ -13,10 +13,13 @@
 #ifndef RAJAPerfSuite_HPP
 #define RAJAPerfSuite_HPP
 
+#include "common/RPTypes.hpp"
+#ifndef RAJAPERF_INFRASTRUCTURE_ONLY
 #include "RAJA/config.hpp"
-
+#include "common/PerfsuiteKernelDefinitions.hpp"
 #if defined(RUN_KOKKOS)
 #include "Kokkos_Core.hpp"
+#endif
 #endif
 
 #include <string>
@@ -37,6 +40,8 @@ void make_perfsuite_executor(Executor* exec, int argc, char* argv[]);
 // 1) Use KokkosViews --> a wrapper around pointers for host and device memory
 // management
 // 2) Use default execution space
+//
+//
 //
 //
 // NEW FUNCTION WILL:
@@ -274,135 +279,16 @@ enum SizeSpec {
 };
 
 
-/*!
- *******************************************************************************
- *
- * \brief Enumeration defining unique id for each group of kernels in suite.
- *
- * IMPORTANT: This is only modified when a group is added or removed.
- *
- *            ENUM VALUES MUST BE KEPT CONSISTENT (CORRESPONDING ONE-TO-ONE) 
- *            WITH ARRAY OF GROUP NAMES IN IMPLEMENTATION FILE!!! 
- *
- *******************************************************************************
- */
-enum GroupID {
-
-  Basic = 0,
-  Lcals,
-  Polybench,
-  Stream,
-  Apps,
-  Algorithm,
-
-  NumGroups // Keep this one last and DO NOT remove (!!)
-
-};
-
-
 //
-/*!
- *******************************************************************************
- *
- * \brief Enumeration defining unique id for each KERNEL in suite.
- *
- * IMPORTANT: This is only modified when a kernel is added or removed.
- *
- *            ENUM VALUES MUST BE KEPT CONSISTENT (CORRESPONDING ONE-TO-ONE) 
- *            WITH ARRAY OF KERNEL NAMES IN IMPLEMENTATION FILE!!! 
- *
- *******************************************************************************
- */
-enum KernelID {
-
-//
-// Basic kernels...
-//
-  Basic_ATOMIC_PI = 0,
-  Basic_DAXPY,
-  Basic_IF_QUAD,
-  Basic_INIT3,
-  Basic_INIT_VIEW1D,
-  Basic_INIT_VIEW1D_OFFSET,
-  Basic_MULADDSUB,
-  Basic_NESTED_INIT,
-  Basic_REDUCE3_INT,
-  Basic_TRAP_INT,
-
-//
-// Lcals kernels...
-//
-  Lcals_DIFF_PREDICT,
-  Lcals_EOS,
-  Lcals_FIRST_DIFF,
-  Lcals_FIRST_MIN,
-  Lcals_FIRST_SUM,
-  Lcals_GEN_LIN_RECUR,
-  Lcals_HYDRO_1D,
-  Lcals_HYDRO_2D,
-  Lcals_INT_PREDICT,
-  Lcals_PLANCKIAN,
-  Lcals_TRIDIAG_ELIM,
-
-//
-// Polybench kernels...
-//
-//  Polybench_2MM,
-//  Polybench_3MM,
-//  Polybench_ADI,
-//  Polybench_ATAX,
-//  Polybench_FDTD_2D,
-//  Polybench_FLOYD_WARSHALL,
-//  Polybench_GEMM,
-//  Polybench_GEMVER,
-//  Polybench_GESUMMV,
-//  Polybench_HEAT_3D,
-//  Polybench_JACOBI_1D,
-//  Polybench_JACOBI_2D,
-//  Polybench_MVT,
-
-
-// Stream kernels...
-//
-  Stream_ADD,
-  Stream_COPY,
-  Stream_DOT,
-  Stream_MUL,
-  Stream_TRIAD,
-
-//
-// Apps kernels...
-//
-//Apps_COUPLE,
-//Apps_DEL_DOT_VEC_2D,
-//Apps_ENERGY,
-//Apps_FIR,
-//Apps_HALOEXCHANGE,
-//Apps_LTIMES,
-//Apps_LTIMES_NOVIEW,
-//Apps_PRESSURE,
-//Apps_VOL3D,
-
-//
-// Algorithm kernels...
-//
-//  Algorithm_SORT,
-//  Algorithm_SORTPAIRS,
-
-  NumKernels // Keep this one last and NEVER comment out (!!)
-
-};
-
-
 /*!
  *******************************************************************************
  *
  * \brief Enumeration defining unique id for each VARIANT in suite.
  *
- * IMPORTANT: This is only modified when a new kernel is added to the suite.
+ * IMPORTANT: This is only modified when a variant is added or removed.
  *
- *            IT MUST BE KEPT CONSISTENT (CORRESPONDING ONE-TO-ONE) WITH
- *            ARRAY OF VARIANT NAMES IN IMPLEMENTATION FILE!!! 
+ *            ENUM VALUES MUST BE KEPT CONSISTENT (CORRESPONDING ONE-TO-ONE) 
+ *            WITH ARRAY OF VARIANT NAMES IN IMPLEMENTATION FILE!!!
  *
  *******************************************************************************
  */
@@ -475,7 +361,7 @@ const std::string& getFullKernelName(KernelID kid);
  *
  *******************************************************************************
  */
-const std::string& getVariantName(VariantID vid); 
+const std::string& getVariantName(VariantID vid);
 
 /*!
  *******************************************************************************
