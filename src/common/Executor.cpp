@@ -653,6 +653,7 @@ namespace rajaperf {
 
         cout << "\n\nRun warmup kernel...\n";
 
+#ifndef RAJAPERF_INFRASTRUCTURE_ONLY
         KernelBase *warmup_kernel = new basic::DAXPY(run_params);
 
         for (size_t iv = 0; iv < variant_ids.size(); ++iv) {
@@ -671,6 +672,7 @@ namespace rajaperf {
         }
 
         delete warmup_kernel;
+#endif
 
 
         cout << "\n\nRunning specified kernels and variants...\n";
